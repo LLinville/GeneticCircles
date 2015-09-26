@@ -8,11 +8,13 @@ class CirclePopulation{
 
     public CirclePopulation(double xlimit, double ylimit, double rlimit, int size){
         for(int i=0; i<size; i++){
-            population.add(new CircleGenome(
+            CircleGenome toAdd = new CircleGenome(
                  random.nextDouble()*xlimit,
                  random.nextDouble()*ylimit,
                  random.nextDouble()*rlimit
-            ));
+            );
+            toAdd.setF(toAdd.getR());
+            population.add(toAdd);
 
         }
     }
@@ -27,22 +29,37 @@ class CirclePopulation{
 
     public List<CircleGenome> asList(){ return population; }
 
-    public CircleGenome selectFrom(){
-        CircleGenome[] poparray = population.toArray();
-        Arrays.sort(population.toArray());
+    public CircleGenome getBest(){
+        CircleGenome[] poparray = population.toArray(new CircleGenome[population.size()]);
+        Arrays.sort(poparray);
+        System.out.println("Returning best of R: "+poparray[0].getR());
+        return poparray[0];
+    }
+
+    public CircleGenome selectFrom(List<Circle> obstacles){
+        CircleGenome[] poparray = population.toArray(new CircleGenome[population.size()]);
+        Arrays.sort(poparray);
 
         int size = population.size();
-        double totalWeight = size*(size+1)*(2*size+1)/6;//sum of size^2
-        int randomIndex = 0;
+        double totalWeight = 0;
+        for(int i=0; i<size; i++){
+            //totalWeight+=Math.pow(poparray[i].getFitness(obstacles),2);
+            //if(poparray[i].getFitness(obstacles) >0.01) totalWeight += i;
+            totalWeight+=i;
+        }
+
         double random = Math.random() * totalWeight;
 
+        double total = 0;
         for (int i = 0; i < size; ++i){//return first time the sum is greater than random
-            random -= (i+1)*(i+1);
-            if (random <= 0.0){
-                System.out.println(i);
-                return population.get(size-randomIndex-1);
+            //random -= Math.pow(poparray[i].getFitness(obstacles),2);
+            total += i;
+            if (total > random){
+                //System.out.println(size-i-1);
+                return poparray[size-i-1];
             }
         }
+        System.out.println("ERROR");
         return null;
     }
 

@@ -1,4 +1,4 @@
-class Circle implements Comparable<Circle>{
+class Circle {//implements Comparable<Circle>{
   private int x,y;
   private double r;
   
@@ -13,11 +13,11 @@ class Circle implements Comparable<Circle>{
   public double getR(){return r;}
   public void setR( int r ){this.r=r;}
   
-  public int compareTo(Circle cir){
-    if(r>cir.getR()) return 1;
-    if(r<cir.getR()) return -1;
-    return 0;
-  }
+//  public int compareTo(Circle cir){
+//    if(r>cir.getR()) return 1;
+//    if(r<cir.getR()) return -1;
+//    return 0;
+//  }
   
   public void print(){
     System.out.println("x: "+x+"\ty: "+y+"\tr: "+r);

@@ -1,8 +1,9 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class CircleApp extends Frame {
-    CircleSimulation csim = new CircleSimulation(0.1,2);
+    CircleSimulation csim = new CircleSimulation(0.2,5);
 
     public CircleApp(){
         super("Genetic Circle Application");
@@ -22,10 +23,18 @@ public class CircleApp extends Frame {
             addMouseListener(new MouseAdapter()
             {public void mousePressed(MouseEvent evt)
                 {
-                    csim.stepGeneration();
-                    repaint();
+                    csim.initializeRandom(500,500,10,20);
                 }
             });
+            int delay = 5; //milliseconds
+            ActionListener taskPerformer = new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    csim.stepGeneration();
+                    System.out.println("Best guess: " + csim.population.getBest().getR());
+                    repaint();
+                }
+            };
+            new Timer(delay, taskPerformer).start();
         }
 
         public void paint(Graphics g) {
@@ -35,8 +44,8 @@ public class CircleApp extends Frame {
 
             for(Circle c : csim.getObstacles()){
                 g.drawOval(
-                        c.getX(),
-                        c.getY(),
+                        (int) Math.round(c.getX()-c.getR()),
+                        (int) Math.round(c.getY()-c.getR()),
                         (int) Math.round(c.getR()),
                         (int) Math.round(c.getR())
                 );
@@ -45,21 +54,33 @@ public class CircleApp extends Frame {
             g.setColor(Color.RED);
             for(CircleGenome c : csim.getPopulation().asList()){
                 g.drawOval(
-                        (int) Math.round(c.getX()),
-                        (int) Math.round(c.getY()),
+                        (int) Math.round(c.getX()-c.getR()),
+                        (int) Math.round(c.getY()-c.getR()),
                         (int) Math.round(c.getR()),
                         (int) Math.round(c.getR())
                 );
             }
+
+            g.setColor(Color.GREEN);
+            double bestR=csim.getPopulation().getBest().getR();
+            g.drawOval(
+                    (int) Math.round(csim.getPopulation().getBest().getX()-bestR),
+                    (int) Math.round(csim.getPopulation().getBest().getY()-bestR),
+                    (int) Math.round(bestR),
+                    (int) Math.round(bestR)
+            );
         }
     }
 
     public void init() {
-        csim.initializeRandom(500,500,100,20);
+        csim.initializeRandom(500,500,100,2);
     }
 
     public static void main(String[] args){
         new CircleApp();
+        while(true){
+            CircleApp.getFrames()[0].repaint();
+        }
     }
 
 }

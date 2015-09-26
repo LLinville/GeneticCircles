@@ -28,24 +28,36 @@ public class CircleSimulation {
     public List<Circle> getObstacles(){ return obstacles; }
 
     public void initializeRandom(int xlimit, int ylimit, double rlimit, int numObstacles){
+        obstacles = new ArrayList<Circle>();
         for(int i=0; i<numObstacles; i++){
             add(new Circle(
                     random.nextInt(xlimit),
                     random.nextInt(ylimit),
-                    random.nextDouble()*rlimit));
+                    random.nextDouble()*(rlimit-10)+10));
         }
 
-        population = new CirclePopulation(xlimit,ylimit,rlimit,numObstacles);
+        population = new CirclePopulation(xlimit,ylimit,rlimit,20);
     }
 
     public void stepGeneration(){
         CirclePopulation newPopulation = new CirclePopulation();
-        for(int i=0; i<population.size(); i++){
-            CircleGenome cg1 = population.selectFrom();
-            CircleGenome cg2 = population.selectFrom();
+        newPopulation.add(population.getBest());
+        for(int i=0; i<population.size()-1; i++){
+            CircleGenome cg1 = population.selectFrom(obstacles);
+            while(cg1.getF()<1){
+                System.out.println("SelectFrom returned intersecting circle");
+                cg1 = population.selectFrom(obstacles);
+            }
+
+            CircleGenome cg2 = population.selectFrom(obstacles);
+            while(cg2.getF()<1){
+                System.out.println("SelectFrom returned intersecting circle");
+                cg2 = population.selectFrom(obstacles);
+            }
+
             CircleGenome childCircle = CircleGenome.breed(cg1, cg2);
-            childCircle.setF(childCircle.getFitness(obstacles));
             childCircle.mutate(mutationChance, mutationConstant);
+            childCircle.setF(childCircle.getFitness(obstacles));
             newPopulation.add(childCircle);
         }
 
